@@ -1,103 +1,117 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState, useEffect, useRef } from 'react';
+
+// Main App component
+const App = () => {
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState<string[]>([]);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+    // Define the portfolio data
+    const aboutMe = "👋 Hey, I’m Matthijs — a software developer who turns ideas into clean, efficient code. I’m all about building apps, APIs, and systems that actually work and scale, whether it’s Flutter, Kotlin, Laravel, or just making data flow without breaking a sweat. I thrive on solving tricky problems, optimizing workflows, and learning new tech stacks faster than most people learn their coffee order (mine’s usually a can of Monster).\n" +
+        "\n" +
+        "When I’m not coding, I’m tinkering with personal projects, exploring the latest dev tools, or upgrading my setup to squeeze every drop of performance out of it.";
+    const projects = [
+        { name: "Fitalize", description: "An app to track your macros and calories.", link: "https://fitalize.app" },
+    ];
+    const contactInfo = "You can find me on GitHub at https://github.com/mkuilen. Let's build something great together!";
+
+    const commands = {
+        help: 'Displays a list of available commands.',
+        about: 'Learn more about me.',
+        projects: 'View a list of my projects.',
+        contact: 'Find my contact information.',
+        clear: 'Clears the terminal screen.',
+    };
+
+    useEffect(() => {
+        if (terminalRef.current) {
+            terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+        }
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [output]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(event.target.value);
+  };
+
+  const handleInputSubmit = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      const command = input.toLowerCase().trim();
+      const newOutput = [...output, `$ ${input}`];
+
+            switch (command) {
+                case 'help':
+                    newOutput.push(
+                        ...Object.entries(commands).map(([cmd, desc]) => `${cmd}: ${desc}`)
+                    );
+                    break;
+                case 'about':
+                    newOutput.push(aboutMe);
+                    break;
+                case 'projects':
+                    projects.forEach(project => {
+                        newOutput.push(`\nName: ${project.name}`);
+                        newOutput.push(`Description: ${project.description}`);
+                        newOutput.push(`Link: ${project.link}\n`);
+                    });
+                    break;
+                case 'contact':
+                    newOutput.push(contactInfo);
+                    break;
+                case 'clear':
+                    setOutput([]);
+                    break;
+                case '':
+                    break;
+                default:
+                    newOutput.push(`Command not found: ${command}. Type 'help' to see available commands.`);
+                    break;
+            }
+            setOutput(newOutput);
+            setInput('');
+        }
+    };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="bg-black text-lime-400 min-h-screen p-4 font-mono antialiased flex flex-col justify-center items-center">
+      <div className="w-full max-w-7xl h-[calc(100vh-2rem)] flex flex-col rounded-lg shadow-2xl p-6 bg-gray-900 border border-gray-700">
+        <div className="flex-none flex space-x-2 pb-4">
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        <div ref={terminalRef} className="flex-grow overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed p-2">
+          <p className="pb-2">
+            Welcome to my portfolio! Type 'help' to get started.
+          </p>
+          {output.map((line, index) => (
+            <div key={index}>{line}</div>
+          ))}
+        </div>
+        <div className="flex-none mt-4 border-t border-gray-700 pt-4">
+          <label htmlFor="terminal-input" className="sr-only">Terminal Input</label>
+          <div className="flex items-center">
+            <span className="text-lime-400 mr-2">$</span>
+            <input
+              id="terminal-input"
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleInputSubmit}
+              className="bg-transparent border-none outline-none text-white flex-grow caret-white"
+              autoFocus
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default App;
